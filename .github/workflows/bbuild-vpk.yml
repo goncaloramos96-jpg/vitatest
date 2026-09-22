@@ -1,0 +1,39 @@
+yamlname: Build VPK
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: # Allows you to trigger the build manually
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-python-version: '3.x'
+
+      - name: Install VPK packaging tool
+        run: |
+          python -m pip install --upgrade pip
+          pip install vpk
+
+      - name: Create VPK file
+        run: |
+          # Replace 'my_addon_folder' with the name of the folder containing your assets
+          # This creates a file named 'my_addon.vpk' from the contents of 'my_addon_folder'
+          vpk -c my_addon.vpk my_addon_folder
+
+      - name: Upload VPK as a build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-addon-vpk
+          path: my_addon.vpk
+          retention-days: 5
